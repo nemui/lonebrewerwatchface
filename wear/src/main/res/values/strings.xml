@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Lone Brewer</string>
+    <string name="title_activity_dfwatchface_config">Lonely Brewer Config Activity</string>
+    <string name="switchText">12h</string>
+    <string name="barrelColourText">÷</string>
+    <string name="magmaColourText">≈</string>
+    <string name="cropsColourText">═</string>
+    <string name="buttonText">OK</string>
+</resources>

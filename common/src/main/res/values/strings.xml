@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Lone Brewer</string>
+    <string name="config_name">Lone Brewer Configuration Activity</string>
+    <string name="okButtonText">OK</string>
+</resources>

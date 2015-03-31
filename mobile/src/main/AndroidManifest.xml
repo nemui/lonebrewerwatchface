@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="deep.dark.lonelybrewer">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="deep.dark.lonebrewer">
 
     <uses-permission
         android:name="com.google.android.permission.PROVIDE_BACKGROUND" />
@@ -8,6 +8,19 @@
     <application android:allowBackup="true" android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
         android:theme="@style/AppTheme">
+
+        <activity
+            android:name="deep.dark.lonebrewer.LBWFCompanionConfigActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name=
+                    "room.one.dfwatchface.CONFIG_24H" />
+                <category android:name=
+                    "com.google.android.wearable.watchface.category.COMPANION_CONFIGURATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 

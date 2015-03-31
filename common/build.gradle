@@ -1,13 +1,11 @@
-apply plugin: 'com.android.application'
-
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 22
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "deep.dark.lonebrewer"
-        minSdkVersion 21
+        minSdkVersion 18
         targetSdkVersion 22
         versionCode 3
         versionName "1.0.2"
@@ -20,13 +18,9 @@ android {
     }
 }
 
-repositories {
-    jcenter()
-}
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.google.android.support:wearable:1.1.0'
-    compile 'org.jraf:android-wear-color-picker:1.0.1'
-    compile project(':common')
+    compile 'com.google.android.gms:play-services-wearable:6.5.87'
 }

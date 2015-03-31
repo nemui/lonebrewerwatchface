@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">Lone Brewer</string>
+    <string name="coloursSection">colors</string>
+    <string name="barrelsHeader">barrels</string>
+    <string name="magmaHeader">magma</string>
+    <string name="cropsHeader">crops</string>
+    <string name="miscSection">misc</string>
+    <string name="timeModeHeader">12 hour mode</string>
+    <string name="weekdaysHeader">weekdays</string>
+    <string name="hemisphereHeader">hemisphere</string>
+    <string name="title_no_device_connected">No wearable device is currently connected.</string>
+    <string name="ok_no_device_connected">OK</string>
+
 </resources>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="deep.dark.lonelybrewer" >
+    package="deep.dark.lonebrewer" >
 
     <uses-feature android:name="android.hardware.type.watch" />
 
@@ -11,12 +11,17 @@
         android:allowBackup="true"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.DeviceDefault" >
+
         <service
-            android:name=".LoneBrewerWatchFace"
+            android:name="deep.dark.lonebrewer.LoneBrewerWatchFace"
             android:allowEmbedded="true"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_WALLPAPER"
             android:taskAffinity="" >
+
+            <meta-data
+                android:name="com.google.android.wearable.watchface.companionConfigurationAction"
+                android:value="room.one.dfwatchface.CONFIG_24H" />
             <meta-data
                 android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
                 android:value="room.one.dfwatchface.CONFIG_24H" />
@@ -37,8 +42,8 @@
         </service>
 
         <activity
-            android:name="deep.dark.lonelybrewer.LBWFConfigActivity"
-            android:label="@string/title_activity_dfwatchface_config" >
+            android:name="deep.dark.lonebrewer.LBWFWearableConfigActivity"
+            android:label="@string/config_name" >
             <intent-filter>
                 <action android:name=
                     "room.one.dfwatchface.CONFIG_24H" />
@@ -48,7 +53,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".dataapi.LBWFConfigListenerService">
+        <service android:name="deep.dark.lonebrewer.LBWFConfigListenerService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>

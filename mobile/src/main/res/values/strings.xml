@@ -5,7 +5,7 @@
     <string name="cropsHeader">crops</string>
     <string name="miscSection">misc</string>
     <string name="timeModeHeader">12 hour mode</string>
-    <string name="weekdaysHeader">weekdays</string>
+    <string name="dayOfTheWeekHeader">day of the week</string>
     <string name="hemisphereHeader">hemisphere</string>
     <string name="title_no_device_connected">No wearable device is currently connected.</string>
     <string name="ok_no_device_connected">OK</string>

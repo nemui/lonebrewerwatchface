@@ -155,7 +155,7 @@
                         android:layout_width="133dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="@string/weekdaysHeader"
+                        android:text="@string/dayOfTheWeekHeader"
                         android:id="@+id/weekdaysHeader"
                         android:layout_gravity="center"/>
 

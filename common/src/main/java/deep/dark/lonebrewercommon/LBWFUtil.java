@@ -12,6 +12,9 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
+/*
+    DataApi-related class used both in companion and wearable configuration activities
+ */
 public final class LBWFUtil {
     private static final String TAG = "LBWFUtil";
 

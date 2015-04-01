@@ -27,29 +27,35 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
-
 import deep.dark.lonebrewercommon.LBWFUtil;
 
 public class LoneBrewerWatchFace extends CanvasWatchFaceService {
 
     private static final String TAG = "LoneBrewerWatchFace";
 
+    // updating only once per second - efficient!
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
+
+    // dwarven calendar in all its glory
     private static final String[] MONTHS = {
             "Opal", "Obsidian", "Granite",
             "Slate", "Felsite", "Hematite",
             "Malachite", "Galena", "Limestone",
             "Sandstone", "Timber", "Moonstone"
     };
+    // you can probably get it from standard Java libs
     private static final String[] DAYS_OF_THE_WEEK = {
             "su", "mo", "tu", "we", "th", "fr", "sa"
     };
+
     private static final String[] ALPHABET = {
             "a", "e", "f", "h", "m", "o", "p", "r", "s", "t", "u", "w"
     };
     private static final String[] SEASONS = {"Spring", "Summer", "Autumn", "Winter"};
     private static final String[] SEASONS_MOD = {"Early", "Mid", "Late"};
-    private static final int DATE_ROW_SQUARE = 7, ENTRY_COLS = 1;
+
+    // an arbitrary row number (counting from the top) for calendar text on a rectangular device
+    private static final int DATE_ROW_SQUARE = 7, HALL_WIDTH = 1;
 
     private static final char[] ROCK_SYMBOLS = {'░', '▒', '▓'},
             UNEXPLORED_CODES = {'%', '\'', ',', '.', '`'},
@@ -87,29 +93,48 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             }
         };
 
+        // something about time zone change. look in the google's watch face sample
         boolean registeredTimeZoneReceiver = false;
+        // we need to know if device is in ambient mode when config changes
+        // otherwise we might start applying colour and it looks weird
         boolean isInAmbientMode = false;
+        // calendar line placement is a tad different for circular devices
         boolean isRound;
+        // still and brewer placement is a tad different for circular devices with a chin
         int chinHeight;
         int hemisphere = LBWFUtil.HEMISPHERE_DEFAULT;
         boolean is12hModeOn = LBWFUtil.IS_12H_MODE_ON_DEFAULT == 1;
         boolean areWeekdaysOn = LBWFUtil.ARE_WEEKDAYS_ON_DEFAULT == 1;
+
+        // original tileset and our very own background bitmaps
         Bitmap tilesetBitmap, backgroundBitmap;
+        // tileset can take cp437 char and return rect of that char in the tileset bitmap
         Tileset tileset;
+        // filters allow us to change bitmap colour
         LightingColorFilter barrelUsualFilter, ambientFilter, cropsUsualFilter, magmaUsualFilter;
         Paint backgroundPaint, datePaint, barrelPaint, magmaPaint, cropsPaint, clearPaint;
         Calendar calendar;
+        // the majority of updates happen only every minute
+        // now problem is, prevMinutes needs to be set to something like -1 every time
+        // we want to update UI
         int minutes, prevMinutes;
+        // AsciiObject can take ascii and tileset and then draw stuff using
+        // canvas.drawBitmap(bitmap, rect, rect, paint);
         AsciiObject[] digits;
         AsciiObject datePart1, datePart2, hour10, hour01, colon, minute10, minute01;
         AsciiObject dayOfTheWeek1, dayOfTheWeek2, apm1, apm2;
         AsciiObject magma;
+        // often used symbol rects
         Rect barrelRect, stoneRect, currentStockpileRect, cropsRect, currentCropsRect, magmaRect, currentMagmaRect;
+        // this will change depending of device form-factor
         int dateRow;
+        // this as well
         String dateDelimiter;
+        // available width and height in symbols
         int symbolCols, symbolRows;
         Still still;
         Brewer brewer;
+        // an attempt to get a bit of data api out of the way
         DataApiHelper dataApiHelper;
         HashMap<String, AsciiObject> alphabet;
 
@@ -150,6 +175,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
 
                 colon = new AsciiObject(readFileToString("colon.txt", assetManager), tileset);
 
+                // still has three colours, so we need three parts
                 still = new Still(tileset,
                         readFileToString("stillPartA.txt", assetManager),
                         readFileToString("stillPartB.txt", assetManager),
@@ -174,13 +200,14 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             barrelUsualFilter = new LightingColorFilter(0, LBWFUtil.BARRELS_COLOUR_DEFAULT);
             barrelPaint = new Paint();
             barrelPaint.setColorFilter(barrelUsualFilter);
-            cropsUsualFilter = new LightingColorFilter(0, LBWFUtil.BARRELS_COLOUR_DEFAULT);
+            cropsUsualFilter = new LightingColorFilter(0, LBWFUtil.CROPS_COLOUR_DEFAULT);
             cropsPaint = new Paint();
             cropsPaint.setColorFilter(cropsUsualFilter);
             magmaUsualFilter = new LightingColorFilter(0, LBWFUtil.MAGMA_COLOUR_DEFAULT);
             magmaPaint = new Paint();
             magmaPaint.setColorFilter(magmaUsualFilter);
 
+            // in theory, we can have background colour other than black
             clearPaint = new Paint();
             clearPaint.setColorFilter(new LightingColorFilter(0, Color.BLACK));
 
@@ -188,6 +215,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             prevMinutes = -1;
 
             dataApiHelper = new DataApiHelper(LoneBrewerWatchFace.this, new DataApiHelper.DataHelperInterface() {
+
                 @Override
                 public boolean updateUiForKey(String configKey, int configValue) {
                     boolean updated = true;
@@ -203,6 +231,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                             break;
                         case LBWFUtil.KEY_BARRELS_COLOUR:
                             barrelUsualFilter = new LightingColorFilter(0, configValue);
+                            // we don't want to start using colour while in ambient mode
                             if (!isInAmbientMode) barrelPaint.setColorFilter(barrelUsualFilter);
                             break;
                         case LBWFUtil.KEY_CROPS_COLOUR:
@@ -255,6 +284,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             super.onAmbientModeChanged(inAmbientMode);
 
             isInAmbientMode = inAmbientMode;
+            // turn everything to white rock salt
             if (inAmbientMode) {
                 barrelPaint.setColorFilter(ambientFilter);
                 cropsPaint.setColorFilter(ambientFilter);
@@ -263,6 +293,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                 currentCropsRect = stoneRect;
                 currentMagmaRect = stoneRect;
             }
+            // turn everything back
             else {
                 barrelPaint.setColorFilter(barrelUsualFilter);
                 cropsPaint.setColorFilter(cropsUsualFilter);
@@ -298,6 +329,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                 symbolCols = width / tileset.symbolWidth;
                 symbolRows = height / tileset.symbolHeight;
 
+                // calendar line has to be broken in two on circular devices
                 if (isRound) {
                     dateDelimiter = "";
                     dateRow = symbolCols / 4 - 3;
@@ -309,6 +341,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                     generateBackground(width, height, dateRow + 2);
                 }
             }
+
             calendar.setTimeInMillis(System.currentTimeMillis());
             minutes = calendar.get(Calendar.MINUTE);
 
@@ -316,9 +349,12 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
 
                 int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
                 int month = calendar.get(Calendar.MONTH);
+
                 if (hemisphere == LBWFUtil.HEMISPHERE_SOUTHERN) {
+                    // seems legit
                     month = (month < 6) ? month + 6 : month - 6;
                 }
+                // a bit of trickery to get month indices to map nicely to season indices
                 int seasonMonth = month - 2 >= 0 ? month - 2 : 12 + month - 2;
                 int season = seasonMonth / 3;
 
@@ -343,6 +379,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
 
                 if (is12hModeOn) {
                     int hour = calendar.get(Calendar.HOUR);
+                    // apm is confusing
                     setTwoDigitValue(hour10, hour01, hour == 0 ? 12 : hour);
                     apm1.copyAscii(calendar.get(Calendar.AM_PM) == Calendar.AM
                             ? alphabet.get("a")
@@ -470,12 +507,14 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             int timeBarrelsWidth = digitWidth * 4 + digitGap * 2 + colon.width;
             int timeBarrelsCol = (symbolCols - timeBarrelsWidth) / 2;
 
+            // time barrels!
             hour10 = new AsciiObject(timeBarrelsCol, timeBarrelsRow);
             hour01 = new AsciiObject(hour10.col + digitWidth + digitGap, timeBarrelsRow);
             colon.setPosition(hour01.col + digitWidth, timeBarrelsRow);
             minute10 = new AsciiObject(colon.col + colon.width, timeBarrelsRow);
             minute01 = new AsciiObject(minute10.col + digitWidth + digitGap, timeBarrelsRow);
 
+            // placing day of the week and apm directly below time barrels
             int weekdayRow = stockpileEndRow + 1;
             magma.setPosition(hour10.col, weekdayRow);
             dayOfTheWeek1 = new AsciiObject(hour10.col, weekdayRow);
@@ -484,14 +523,15 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             apm2 = new AsciiObject(minute01.col, weekdayRow);
             apm2.copyAscii(alphabet.get("m"));
 
-            // then there is a corridor
+            // then there is a narrow corridor
             int entryEndCol = minute10.col - 2;
-            int entryStartCol = entryEndCol - ENTRY_COLS + 1;
+            int entryStartCol = entryEndCol - HALL_WIDTH + 1;
 
             // with a brewery entrance in it
             int breweryEntranceCol = entryEndCol + 1;
             int breweryEntranceRow = stockpileEndRow + 3;
 
+            // brewer and his still should be above the chin at all times
             int stillRow = symbolRows - (4 + (int)Math.ceil(chinHeight / tileset.symbolHeight));
             still.setPosition(breweryEntranceCol + 1, stillRow);
             brewer.setPosition(breweryEntranceCol + 1 + 4, stillRow);

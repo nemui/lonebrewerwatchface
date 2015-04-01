@@ -21,10 +21,10 @@
 
             <meta-data
                 android:name="com.google.android.wearable.watchface.companionConfigurationAction"
-                android:value="room.one.dfwatchface.CONFIG_24H" />
+                android:value="deep.dark.lonebrewer.CONFIG" />
             <meta-data
                 android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
-                android:value="room.one.dfwatchface.CONFIG_24H" />
+                android:value="deep.dark.lonebrewer.CONFIG" />
             <meta-data
                 android:name="android.service.wallpaper"
                 android:resource="@xml/watch_face" />
@@ -46,7 +46,7 @@
             android:label="@string/config_name" >
             <intent-filter>
                 <action android:name=
-                    "room.one.dfwatchface.CONFIG_24H" />
+                    "deep.dark.lonebrewer.CONFIG" />
                 <category android:name=
                     "com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
                 <category android:name="android.intent.category.DEFAULT" />

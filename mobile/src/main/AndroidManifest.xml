@@ -14,7 +14,7 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name=
-                    "room.one.dfwatchface.CONFIG_24H" />
+                    "deep.dark.lonebrewer.CONFIG" />
                 <category android:name=
                     "com.google.android.wearable.watchface.category.COMPANION_CONFIGURATION" />
                 <category android:name="android.intent.category.DEFAULT" />

@@ -6,9 +6,14 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import java.util.ArrayList;
 
+/*
+    AsciiObject can take ascii and tileset and then draw stuff using
+    canvas.drawBitmap(bitmap, rect, rect, paint)
+ */
 public class AsciiObject {
     private static final String TAG = "AsciiObject";
 
+    // need for relative positioning
     public int width, height;
 
     int col, row;
@@ -85,6 +90,7 @@ public class AsciiObject {
         }
     }
 
+    // we need this method for ambient mode where everything is drawn as rock salt (additional srcRect)
     public void draw (Bitmap tilesetBitmap, Canvas canvas, Paint background, Paint foreground, Rect srcRect) {
         for (int i = 0; i < dstRects.length; i++) {
             canvas.drawRect(dstRects[i], background);

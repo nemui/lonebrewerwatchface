@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import org.jraf.android.androidwearcolorpicker.app.ColorPickActivity;
-
 import deep.dark.lonebrewercommon.LBWFUtil;
 
 public class LBWFWearableConfigActivity extends Activity {

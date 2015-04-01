@@ -11,9 +11,12 @@ import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
-
 import deep.dark.lonebrewercommon.LBWFUtil;
 
+/*
+    A feeble attempt to decouple DataApi with the rest of the stuff.
+    Should have left original comments.
+ */
 public class DataApiHelper implements DataApi.DataListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 

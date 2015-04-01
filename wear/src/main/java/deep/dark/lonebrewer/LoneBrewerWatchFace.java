@@ -12,7 +12,6 @@ import android.graphics.Color;
 import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.wearable.watchface.CanvasWatchFaceService;
@@ -25,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -41,12 +41,18 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             "Malachite", "Galena", "Limestone",
             "Sandstone", "Timber", "Moonstone"
     };
+    private static final String[] DAYS_OF_THE_WEEK = {
+            "su", "mo", "tu", "we", "th", "fr", "sa"
+    };
+    private static final String[] ALPHABET = {
+            "a", "e", "f", "h", "m", "o", "p", "r", "s", "t", "u", "w"
+    };
     private static final String[] SEASONS = {"Spring", "Summer", "Autumn", "Winter"};
     private static final String[] SEASONS_MOD = {"Early", "Mid", "Late"};
-    private static final int DATE_ROW_SQUARE = 7, ENTRY_COLS = 3;
+    private static final int DATE_ROW_SQUARE = 7, ENTRY_COLS = 1;
 
     private static final char[] ROCK_SYMBOLS = {'░', '▒', '▓'},
-            UNEXPLORED_OTHER_CODES = {'%', '\'', ',', '.', '`'},
+            UNEXPLORED_CODES = {'%', '\'', ',', '.', '`'},
             ROUGH_FLOOR_CODES = {'\'', ',', '.', '`'};
 
     @Override
@@ -82,20 +88,22 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
         };
 
         boolean registeredTimeZoneReceiver = false;
-        boolean lowBitAmbient;
-        boolean burnInProtection;
+        boolean isInAmbientMode = false;
         boolean isRound;
         int chinHeight;
+        int hemisphere = LBWFUtil.HEMISPHERE_DEFAULT;
         boolean is12hModeOn = LBWFUtil.IS_12H_MODE_ON_DEFAULT == 1;
+        boolean areWeekdaysOn = LBWFUtil.ARE_WEEKDAYS_ON_DEFAULT == 1;
         Bitmap tilesetBitmap, backgroundBitmap;
         Tileset tileset;
         LightingColorFilter barrelUsualFilter, ambientFilter, cropsUsualFilter, magmaUsualFilter;
         Paint backgroundPaint, datePaint, barrelPaint, magmaPaint, cropsPaint, clearPaint;
         Calendar calendar;
         int minutes, prevMinutes;
-        AsciiObject[] digits, weekdays;
+        AsciiObject[] digits;
         AsciiObject datePart1, datePart2, hour10, hour01, colon, minute10, minute01;
-        AsciiObject weekday, aOrP, aLetter, pLetter, mLetter;
+        AsciiObject dayOfTheWeek1, dayOfTheWeek2, apm1, apm2;
+        AsciiObject magma;
         Rect barrelRect, stoneRect, currentStockpileRect, cropsRect, currentCropsRect, magmaRect, currentMagmaRect;
         int dateRow;
         String dateDelimiter;
@@ -103,11 +111,12 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
         Still still;
         Brewer brewer;
         DataApiHelper dataApiHelper;
+        HashMap<String, AsciiObject> alphabet;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
-            // android.os.Debug.waitForDebugger();
+
             setWatchFaceStyle(new WatchFaceStyle.Builder(LoneBrewerWatchFace.this)
                     .setCardPeekMode(WatchFaceStyle.PEEK_MODE_SHORT)
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
@@ -133,22 +142,23 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                 for (int i = 0; i < 10; i++) {
                     digits[i] = new AsciiObject(readFileToString("digits/digit" + i + ".txt", assetManager), tileset);
                 }
-                weekdays = new AsciiObject[7];
-                for (int i = 0; i < 7; i++) {
-                    weekdays[i] = new AsciiObject(readFileToString("weekdays/weekday" + i + ".txt", assetManager), tileset);
+
+                alphabet = new HashMap<>();
+                for(String letter : ALPHABET){
+                    alphabet.put(letter, new AsciiObject(readFileToString("letters/" + letter + ".txt", assetManager), tileset));
                 }
 
                 colon = new AsciiObject(readFileToString("colon.txt", assetManager), tileset);
-                aLetter = new AsciiObject(readFileToString("a.txt", assetManager), tileset);
-                pLetter = new AsciiObject(readFileToString("p.txt", assetManager), tileset);
-                mLetter = new AsciiObject(readFileToString("m.txt", assetManager), tileset);
 
                 still = new Still(tileset,
                         readFileToString("stillPartA.txt", assetManager),
                         readFileToString("stillPartB.txt", assetManager),
                         readFileToString("stillPartC.txt", assetManager)
                 );
+
                 brewer = new Brewer(tileset);
+
+                magma = new AsciiObject(readFileToString("magma.txt", assetManager), tileset);
             }
             catch (IOException e) {
                 Log.e(TAG, "IO-related horrors");
@@ -185,17 +195,23 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                         case LBWFUtil.KEY_TIME_MODE:
                             is12hModeOn = configValue == 1;
                             break;
+                        case LBWFUtil.KEY_WEEKDAYS:
+                            areWeekdaysOn = configValue == 1;
+                            break;
+                        case LBWFUtil.KEY_HEMISPHERE:
+                            hemisphere = configValue;
+                            break;
                         case LBWFUtil.KEY_BARRELS_COLOUR:
                             barrelUsualFilter = new LightingColorFilter(0, configValue);
-                            barrelPaint.setColorFilter(barrelUsualFilter);
+                            if (!isInAmbientMode) barrelPaint.setColorFilter(barrelUsualFilter);
                             break;
                         case LBWFUtil.KEY_CROPS_COLOUR:
                             cropsUsualFilter = new LightingColorFilter(0, configValue);
-                            cropsPaint.setColorFilter(cropsUsualFilter);
+                            if (!isInAmbientMode) cropsPaint.setColorFilter(cropsUsualFilter);
                             break;
                         case LBWFUtil.KEY_MAGMA_COLOUR:
                             magmaUsualFilter = new LightingColorFilter(0, configValue);
-                            magmaPaint.setColorFilter(magmaUsualFilter);
+                            if (!isInAmbientMode) magmaPaint.setColorFilter(magmaUsualFilter);
                             break;
                         default:
                             updated = false;
@@ -229,13 +245,6 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
         }
 
         @Override
-        public void onPropertiesChanged(Bundle properties) {
-            super.onPropertiesChanged(properties);
-            lowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
-            burnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
-        }
-
-        @Override
         public void onTimeTick() {
             super.onTimeTick();
             invalidate();
@@ -245,6 +254,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
 
+            isInAmbientMode = inAmbientMode;
             if (inAmbientMode) {
                 barrelPaint.setColorFilter(ambientFilter);
                 cropsPaint.setColorFilter(ambientFilter);
@@ -287,13 +297,13 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                 // getting the size of the screen in symbols
                 symbolCols = width / tileset.symbolWidth;
                 symbolRows = height / tileset.symbolHeight;
-                Log.i(TAG, "width " + width + ", height " + height);
 
                 if (isRound) {
                     dateDelimiter = "";
                     dateRow = symbolCols / 4 - 3;
                     generateBackground(width, height, symbolCols / 4);
-                } else {
+                }
+                else {
                     dateDelimiter = ", ";
                     dateRow = DATE_ROW_SQUARE;
                     generateBackground(width, height, dateRow + 2);
@@ -306,6 +316,9 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
 
                 int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
                 int month = calendar.get(Calendar.MONTH);
+                if (hemisphere == LBWFUtil.HEMISPHERE_SOUTHERN) {
+                    month = (month < 6) ? month + 6 : month - 6;
+                }
                 int seasonMonth = month - 2 >= 0 ? month - 2 : 12 + month - 2;
                 int season = seasonMonth / 3;
 
@@ -324,13 +337,19 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                     datePart2.setPosition(datePart1.col + datePart1.width, dateRow);
                 }
 
-                weekday.copyAscii(weekdays[calendar.get(Calendar.DAY_OF_WEEK) - 1]);
+                String abbreviation = DAYS_OF_THE_WEEK[calendar.get(Calendar.DAY_OF_WEEK) - 1];
+                dayOfTheWeek1.copyAscii(alphabet.get(abbreviation.substring(0, 1)));
+                dayOfTheWeek2.copyAscii(alphabet.get(abbreviation.substring(1, 2)));
 
                 if (is12hModeOn) {
                     int hour = calendar.get(Calendar.HOUR);
                     setTwoDigitValue(hour10, hour01, hour == 0 ? 12 : hour);
-                    aOrP = calendar.get(Calendar.AM_PM) == Calendar.AM ? aLetter : pLetter;
-                } else {
+                    apm1.copyAscii(calendar.get(Calendar.AM_PM) == Calendar.AM
+                            ? alphabet.get("a")
+                            : alphabet.get("p")
+                    );
+                }
+                else {
                     setTwoDigitValue(hour10, hour01, calendar.get(Calendar.HOUR_OF_DAY));
                 }
 
@@ -347,6 +366,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                 canvas.drawBitmap(backgroundBitmap, 0, 0, backgroundPaint);
                 still.draw(tilesetBitmap, canvas, clearPaint);
                 brewer.draw(tilesetBitmap, canvas, clearPaint);
+                if (!areWeekdaysOn) magma.draw(tilesetBitmap, canvas, clearPaint, magmaPaint);
             }
 
             hour10.draw(tilesetBitmap, canvas, clearPaint, barrelPaint, currentStockpileRect);
@@ -355,11 +375,14 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             minute10.draw(tilesetBitmap, canvas, clearPaint, barrelPaint, currentStockpileRect);
             minute01.draw(tilesetBitmap, canvas, clearPaint, barrelPaint, currentStockpileRect);
 
-            weekday.draw(tilesetBitmap, canvas, clearPaint, magmaPaint, currentMagmaRect);
+            if (areWeekdaysOn) {
+                dayOfTheWeek1.draw(tilesetBitmap, canvas, clearPaint, magmaPaint, currentMagmaRect);
+                dayOfTheWeek2.draw(tilesetBitmap, canvas, clearPaint, magmaPaint, currentMagmaRect);
+            }
 
             if (is12hModeOn) {
-                aOrP.draw(tilesetBitmap, canvas, clearPaint, cropsPaint, currentCropsRect);
-                mLetter.draw(tilesetBitmap, canvas, clearPaint, cropsPaint, currentCropsRect);
+                apm1.draw(tilesetBitmap, canvas, clearPaint, cropsPaint, currentCropsRect);
+                apm2.draw(tilesetBitmap, canvas, clearPaint, cropsPaint, currentCropsRect);
             }
         }
 
@@ -453,16 +476,16 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             minute10 = new AsciiObject(colon.col + colon.width, timeBarrelsRow);
             minute01 = new AsciiObject(minute10.col + digitWidth + digitGap, timeBarrelsRow);
 
-            weekday = new AsciiObject(hour10.col + digitWidth / 2 + 1, stockpileEndRow + 1);
-
-            int aOrPCol = minute10.col;
-            int aOrPRow = stockpileEndRow + 1;
-            aLetter.setPosition(aOrPCol, aOrPRow);
-            pLetter.setPosition(aOrPCol, aOrPRow);
-            mLetter.setPosition(minute01.col, aOrPRow);
+            int weekdayRow = stockpileEndRow + 1;
+            magma.setPosition(hour10.col, weekdayRow);
+            dayOfTheWeek1 = new AsciiObject(hour10.col, weekdayRow);
+            dayOfTheWeek2 = new AsciiObject(hour01.col, weekdayRow);
+            apm1 = new AsciiObject(minute10.col, weekdayRow);
+            apm2 = new AsciiObject(minute01.col, weekdayRow);
+            apm2.copyAscii(alphabet.get("m"));
 
             // then there is a corridor
-            int entryEndCol = minute10.col - 3;
+            int entryEndCol = minute10.col - 2;
             int entryStartCol = entryEndCol - ENTRY_COLS + 1;
 
             // with a brewery entrance in it
@@ -528,7 +551,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                             if (Math.random() * 10 < 9.6f) {
                                 src = tileset.getSymbolRect(' ');
                             } else {
-                                src = tileset.getSymbolRect(UNEXPLORED_OTHER_CODES[(int) (Math.random() * UNEXPLORED_OTHER_CODES.length)]);
+                                src = tileset.getSymbolRect(UNEXPLORED_CODES[(int) (Math.random() * UNEXPLORED_CODES.length)]);
                             }
                         }
                     }

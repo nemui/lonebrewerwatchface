@@ -1,175 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/coloursSection"
-        android:id="@+id/coloursSectionHeader"
-        android:layout_margin="20dp"/>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="10dp">
-
-        <TextView
-            android:layout_width="200dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/barrelsHeader"
-            android:id="@+id/barrelHeader"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:orientation="vertical">
 
-        <android.support.wearable.view.CircledImageView
-            android:id="@+id/barrelColour"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            app:circle_border_color="@color/color_item_circle_border_color"
-            app:circle_radius="21dp"
-            app:circle_border_width="1dp"/>
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/coloursSection"
+                android:id="@+id/coloursSectionHeader"
+                android:layout_margin="20dp"/>
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="10dp">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginBottom="10dp">
 
-        <TextView
-            android:layout_width="200dp"
+                <TextView
+                    android:layout_width="245dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/barrelsHeader"
+                    android:id="@+id/barrelHeader"
+                    android:layout_gravity="center"/>
+
+                <android.support.wearable.view.CircledImageView
+                    android:id="@+id/barrelColour"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    app:circle_border_color="@color/color_item_circle_border_color"
+                    app:circle_radius="21dp"
+                    app:circle_border_width="1dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="245dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/magmaHeader"
+                    android:id="@+id/magmaHeader"
+                    android:layout_gravity="center"/>
+
+                <android.support.wearable.view.CircledImageView
+                    android:id="@+id/magmaColour"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_gravity="center_vertical"
+                    app:circle_border_color="@color/color_item_circle_border_color"
+                    app:circle_radius="21dp"
+                    app:circle_border_width="1dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="245dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/cropsHeader"
+                    android:id="@+id/cropsHeader"
+                    android:layout_gravity="center"/>
+
+                <android.support.wearable.view.CircledImageView
+                    android:id="@+id/cropsColour"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_gravity="center_vertical"
+                    app:circle_border_color="@color/color_item_circle_border_color"
+                    app:circle_radius="21dp"
+                    app:circle_border_width="1dp"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/miscSection"
+                android:id="@+id/miscSectionHeader"
+                android:layout_margin="20dp"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="133dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/timeModeHeader"
+                    android:id="@+id/timeModeHeader"
+                    android:layout_gravity="center"/>
+
+                <Switch
+                    android:layout_width="160dp"
+                    android:layout_height="42dp"
+                    android:id="@+id/timeModeSwitch"
+                    android:textOff="off"
+                    android:textOn="on"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="133dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/weekdaysHeader"
+                    android:id="@+id/weekdaysHeader"
+                    android:layout_gravity="center"/>
+
+                <Switch
+                    android:layout_width="160dp"
+                    android:layout_height="42dp"
+                    android:id="@+id/weekdaysSwitch"
+                    android:textOff="hide"
+                    android:textOn="show" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="133dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/hemisphereHeader"
+                    android:id="@+id/hemisphereHeader"
+                    android:layout_gravity="center"/>
+
+                <Switch
+                    android:layout_width="160dp"
+                    android:layout_height="42dp"
+                    android:id="@+id/hemisphereSwitch"
+                    android:textOff="southern"
+                    android:textOn="northern" />
+
+            </LinearLayout>
+
+        <Button
+            android:layout_width="140dp"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/magmaHeader"
-            android:id="@+id/magmaHeader"
-            android:layout_gravity="center"/>
+            android:text = "@string/okButtonText"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:id="@+id/okButton" />
 
-        <android.support.wearable.view.CircledImageView
-            android:id="@+id/magmaColour"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:layout_gravity="center_vertical"
-            app:circle_border_color="@color/color_item_circle_border_color"
-            app:circle_radius="21dp"
-            app:circle_border_width="1dp"/>
-    </LinearLayout>
+        </LinearLayout>
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="10dp">
-
-        <TextView
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/cropsHeader"
-            android:id="@+id/cropsHeader"
-            android:layout_gravity="center"/>
-
-        <android.support.wearable.view.CircledImageView
-            android:id="@+id/cropsColour"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:layout_gravity="center_vertical"
-            app:circle_border_color="@color/color_item_circle_border_color"
-            app:circle_radius="21dp"
-            app:circle_border_width="1dp"/>
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/miscSection"
-        android:id="@+id/miscSectionHeader"
-        android:layout_margin="20dp"/>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="10dp">
-
-        <TextView
-            android:layout_width="133dp"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/timeModeHeader"
-            android:id="@+id/timeModeHeader"
-            android:layout_gravity="center"/>
-
-        <Switch
-            android:layout_width="175dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/timeModeSwitch"
-            android:textOff="off"
-            android:textOn="on"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="10dp">
-
-        <TextView
-            android:layout_width="133dp"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/weekdaysHeader"
-            android:id="@+id/weekdaysHeader"
-            android:layout_gravity="center"/>
-
-        <Switch
-            android:layout_width="175dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/weekdaysSwitch"
-            android:textOff="hide"
-            android:textOn="show" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="10dp">
-
-        <TextView
-            android:layout_width="133dp"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/hemisphereHeader"
-            android:id="@+id/hemisphereHeader"
-            android:layout_gravity="center"/>
-
-        <Switch
-            android:layout_width="175dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/hemisphereSwitch"
-            android:textOff="southern"
-            android:textOn="northern" />
-    </LinearLayout>
-
-    <Button
-        android:layout_width="140dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:text = "@string/okButtonText"
-        android:id="@+id/okButton" />
-
-</LinearLayout>
+</FrameLayout>

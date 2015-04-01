@@ -21,7 +21,9 @@ public final class LBWFUtil {
 
     public static final String PATH_WITH_FEATURE = "/watch_face_config/LoneBrewerWatchFace";
 
-    public static final int IS_12H_MODE_ON_DEFAULT = 1, HEMISPHERE_DEFAULT = 0,
+    public static final int IS_12H_MODE_ON_DEFAULT = 1,
+            HEMISPHERE_NORTHERN = 0, HEMISPHERE_SOUTHERN = 1,
+            HEMISPHERE_DEFAULT = HEMISPHERE_NORTHERN,
             ARE_WEEKDAYS_ON_DEFAULT = 1, BARRELS_COLOUR_DEFAULT = Color.YELLOW,
             CROPS_COLOUR_DEFAULT = Color.YELLOW, MAGMA_COLOUR_DEFAULT = Color.RED;
 

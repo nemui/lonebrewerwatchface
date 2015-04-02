@@ -18,22 +18,44 @@ import com.google.android.gms.wearable.Wearable;
 public final class LBWFUtil {
     private static final String TAG = "LBWFUtil";
 
+    /**
+     * The {@link DataMap} keys for LoneBrewerWatchFace configuration.
+     */
     public static final String KEY_TIME_MODE = "TIME_MODE", KEY_HEMISPHERE = "HEMISPHERE",
-            KEY_WEEKDAYS = "WEEKDAYS", KEY_BARRELS_COLOUR = "BARREL_COLOUR",
+            KEY_DAY_OF_THE_WEEK = "DAY_OF_THE_WEEK", KEY_BARRELS_COLOUR = "BARREL_COLOUR",
             KEY_CROPS_COLOUR = "CROPS_COLOUR", KEY_MAGMA_COLOUR = "MAGMA_COLOUR";
 
+    /**
+     * The path for the {@link DataItem} containing LoneBrewerWatchFace configuration.
+     */
     public static final String PATH_WITH_FEATURE = "/watch_face_config/LoneBrewerWatchFace";
 
+    // defaults
     public static final int IS_12H_MODE_ON_DEFAULT = 1,
             HEMISPHERE_NORTHERN = 0, HEMISPHERE_SOUTHERN = 1,
             HEMISPHERE_DEFAULT = HEMISPHERE_NORTHERN,
-            ARE_WEEKDAYS_ON_DEFAULT = 1, BARRELS_COLOUR_DEFAULT = Color.YELLOW,
+            IS_DAY_OF_THE_WEEK_ON_DEFAULT = 1, BARRELS_COLOUR_DEFAULT = Color.YELLOW,
             CROPS_COLOUR_DEFAULT = Color.YELLOW, MAGMA_COLOUR_DEFAULT = Color.RED;
 
+    /**
+     * Callback interface to perform an action with the current config {@link DataMap} for
+     * LoneBrewerWatchFace.
+     */
     public interface FetchConfigDataMapCallback {
+        /**
+         * Callback invoked with the current config {@link DataMap} for
+         * LoneBrewerWatchFace.
+         */
         void onConfigDataMapFetched(DataMap config);
     }
 
+    /**
+     * Asynchronously fetches the current config {@link DataMap} for LoneBrewerWatchFace
+     * and passes it to the given callback.
+     * <p>
+     * If the current config {@link DataItem} doesn't exist, it isn't created and the callback
+     * receives an empty DataMap.
+     */
     public static void fetchConfigDataMap(final GoogleApiClient client,
             final FetchConfigDataMapCallback callback) {
         Wearable.NodeApi.getLocalNode(client).setResultCallback(
@@ -53,6 +75,14 @@ public final class LBWFUtil {
         );
     }
 
+    /**
+     * Overwrites (or sets, if not present) the keys in the current config {@link DataItem} with
+     * the ones appearing in the given {@link DataMap}. If the config DataItem doesn't exist,
+     * it's created.
+     * <p>
+     * It is allowed that only some of the keys used in the config DataItem appear in
+     * {@code configKeysToOverwrite}. The rest of the keys remains unmodified in this case.
+     */
     public static void overwriteKeysInConfigDataMap(final GoogleApiClient googleApiClient,
             final DataMap configKeysToOverwrite) {
 
@@ -69,6 +99,10 @@ public final class LBWFUtil {
         );
     }
 
+    /**
+     * Overwrites the current config {@link DataItem}'s {@link DataMap} with {@code newConfig}.
+     * If the config DataItem doesn't exist, it's created.
+     */
     public static void putConfigDataItem(GoogleApiClient googleApiClient, DataMap newConfig) {
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(PATH_WITH_FEATURE);
         DataMap configToPut = putDataMapRequest.getDataMap();
@@ -110,8 +144,8 @@ public final class LBWFUtil {
         if (!config.containsKey(KEY_HEMISPHERE)){
             config.putInt(KEY_HEMISPHERE, HEMISPHERE_DEFAULT);
         }
-        if (!config.containsKey(KEY_WEEKDAYS)){
-            config.putInt(KEY_WEEKDAYS, ARE_WEEKDAYS_ON_DEFAULT);
+        if (!config.containsKey(KEY_DAY_OF_THE_WEEK)){
+            config.putInt(KEY_DAY_OF_THE_WEEK, IS_DAY_OF_THE_WEEK_ON_DEFAULT);
         }
         if (!config.containsKey(KEY_BARRELS_COLOUR)){
             config.putInt(KEY_BARRELS_COLOUR, BARRELS_COLOUR_DEFAULT);

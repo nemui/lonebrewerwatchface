@@ -22,6 +22,12 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 import deep.dark.lonebrewercommon.LBWFUtil;
 
+/**
+ * The phone-side config activity for {@code LoneBrewerWatchFace}. Like the watch-side config
+ * activity ({@code LBWFWearableConfigActivity}), allows for toggling 12 hour mode as well as
+ * setting  the colours for barrels, magma and crops.
+ * Additionally, enables toggling day of the week display and selecting the hemisphere.
+ */
 public class LBWFCompanionConfigActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         ResultCallback<DataApi.DataItemResult> {
@@ -52,7 +58,7 @@ public class LBWFCompanionConfigActivity extends Activity
         weekdaysSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                sendConfigUpdateMessage(LBWFUtil.KEY_WEEKDAYS, isChecked ? 1 : 0);
+                sendConfigUpdateMessage(LBWFUtil.KEY_DAY_OF_THE_WEEK, isChecked ? 1 : 0);
             }
         });
 
@@ -165,6 +171,8 @@ public class LBWFCompanionConfigActivity extends Activity
             config = dataMapItem.getDataMap();
         }
         else {
+            // If DataItem with the current config can't be retrieved, select the default items on
+            // each picker.
             config = new DataMap();
             LBWFUtil.setDefaultValuesForMissingConfigKeys(config);
         }
@@ -192,7 +200,7 @@ public class LBWFCompanionConfigActivity extends Activity
 
     private void setUpUI(DataMap config) {
         timeModeSwitch.setChecked(config.getInt(LBWFUtil.KEY_TIME_MODE) == 1);
-        weekdaysSwitch.setChecked(config.getInt(LBWFUtil.KEY_WEEKDAYS) == 1);
+        weekdaysSwitch.setChecked(config.getInt(LBWFUtil.KEY_DAY_OF_THE_WEEK) == 1);
         hemisphereSwitch.setChecked(config.getInt(LBWFUtil.KEY_HEMISPHERE) == 0);
         barrelsColour = config.getInt(LBWFUtil.KEY_BARRELS_COLOUR);
         magmaColour = config.getInt(LBWFUtil.KEY_MAGMA_COLOUR);

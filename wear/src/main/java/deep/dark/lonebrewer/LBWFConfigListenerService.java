@@ -10,6 +10,12 @@ import com.google.android.gms.wearable.WearableListenerService;
 import java.util.concurrent.TimeUnit;
 import deep.dark.lonebrewercommon.LBWFUtil;
 
+
+/**
+ * A {@link WearableListenerService} listening for {@link deep.dark.lonebrewer.LoneBrewerWatchFace} config messages
+ * and updating the config {@link com.google.android.gms.wearable.DataItem} accordingly.
+ */
+
 public class LBWFConfigListenerService extends WearableListenerService
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "LBWFConfigListenerService";
@@ -23,6 +29,8 @@ public class LBWFConfigListenerService extends WearableListenerService
         }
         byte[] rawData = messageEvent.getData();
 
+        // It's allowed that the message carries only some of the keys used in the config DataItem
+        // and skips the ones that we don't want to change.
         DataMap configKeysToOverwrite = DataMap.fromByteArray(rawData);
 
         if (googleApiClient == null) {

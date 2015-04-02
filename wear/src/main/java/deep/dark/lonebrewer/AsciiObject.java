@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class AsciiObject {
     private static final String TAG = "AsciiObject";
 
-    // need for relative positioning
+    // for relative positioning
     public int width, height;
 
     int col, row;

@@ -36,14 +36,14 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
     // updating only once per second - efficient!
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
 
-    // dwarven calendar in all its glory
+
     private static final String[] MONTHS = {
             "Opal", "Obsidian", "Granite",
             "Slate", "Felsite", "Hematite",
             "Malachite", "Galena", "Limestone",
             "Sandstone", "Timber", "Moonstone"
     };
-    // you can probably get it from standard Java libs
+
     private static final String[] DAYS_OF_THE_WEEK = {
             "su", "mo", "tu", "we", "th", "fr", "sa"
     };
@@ -69,6 +69,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
     private class Engine extends CanvasWatchFaceService.Engine {
         static final int MSG_UPDATE_TIME = 0;
 
+        // handler to update the time once a second in interactive mode
         final Handler updateTimeHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
@@ -93,10 +94,9 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             }
         };
 
-        // something about time zone change. look in the google's watch face sample
         boolean registeredTimeZoneReceiver = false;
         // we need to know if device is in ambient mode when config changes
-        // otherwise we might start applying colour and it looks weird
+        // otherwise we might start applying colours when in b/w
         boolean isInAmbientMode = false;
         // calendar line placement is a tad different for circular devices
         boolean isRound;
@@ -104,7 +104,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
         int chinHeight;
         int hemisphere = LBWFUtil.HEMISPHERE_DEFAULT;
         boolean is12hModeOn = LBWFUtil.IS_12H_MODE_ON_DEFAULT == 1;
-        boolean areWeekdaysOn = LBWFUtil.ARE_WEEKDAYS_ON_DEFAULT == 1;
+        boolean areWeekdaysOn = LBWFUtil.IS_DAY_OF_THE_WEEK_ON_DEFAULT == 1;
 
         // original tileset and our very own background bitmaps
         Bitmap tilesetBitmap, backgroundBitmap;
@@ -223,7 +223,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                         case LBWFUtil.KEY_TIME_MODE:
                             is12hModeOn = configValue == 1;
                             break;
-                        case LBWFUtil.KEY_WEEKDAYS:
+                        case LBWFUtil.KEY_DAY_OF_THE_WEEK:
                             areWeekdaysOn = configValue == 1;
                             break;
                         case LBWFUtil.KEY_HEMISPHERE:
@@ -306,6 +306,8 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             prevMinutes = -1;
             invalidate();
 
+            // whether the timer should be running depends on whether we're in ambient mode (as well
+            // as whether we're visible), so we may need to start or stop the timer.
             updateTimer();
         }
 
@@ -321,6 +323,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             int width = bounds.width();
             int height = bounds.height();
 
+            // draw the background
             if (backgroundBitmap == null
                     || backgroundBitmap.getWidth() != width
                     || backgroundBitmap.getHeight() != height) {
@@ -354,7 +357,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                     // seems legit
                     month = (month < 6) ? month + 6 : month - 6;
                 }
-                // a bit of trickery to get month indices to map nicely to season indices
+                // a bit of trickery to get month indices to map nicely into season indices
                 int seasonMonth = month - 2 >= 0 ? month - 2 : 12 + month - 2;
                 int season = seasonMonth / 3;
 
@@ -435,12 +438,16 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             if (visible) {
                 dataApiHelper.connect();
                 registerReceiver();
+
+                // update time zone in case it changed while we weren't visible.
                 calendar.setTimeZone(TimeZone.getDefault());
             } else {
                 unregisterReceiver();
                 dataApiHelper.disconnect();
             }
 
+            // whether the timer should be running depends on whether we're visible (as well as
+            // whether we're in ambient mode), so we may need to start or stop the timer.
             updateTimer();
         }
 
@@ -461,6 +468,9 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             LoneBrewerWatchFace.this.unregisterReceiver(mTimeZoneReceiver);
         }
 
+
+        // starts the updateTimeHandler timer if it should be running and isn't currently
+        // stops it if it shouldn't be running but currently is.
         private void updateTimer() {
             updateTimeHandler.removeMessages(MSG_UPDATE_TIME);
             if (shouldTimerBeRunning()) {
@@ -484,6 +494,8 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
             }
         }
 
+        // returns whether the updateTimeHandler timer should be running. The timer should
+        // only run when we're visible and in interactive mode.
         private boolean shouldTimerBeRunning() {
             return isVisible() && !isInAmbientMode();
         }

@@ -14,8 +14,7 @@ import com.google.android.gms.wearable.Wearable;
 import deep.dark.lonebrewercommon.LBWFUtil;
 
 /*
-    A feeble attempt to decouple DataApi with the rest of the stuff.
-    Should have left original comments.
+    A feeble attempt to decouple DataApi from the rest of the stuff.
  */
 public class DataApiHelper implements DataApi.DataListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -32,6 +31,7 @@ public class DataApiHelper implements DataApi.DataListener,
         this.dataHelperListener = dataHelperListener;
     }
 
+    // updates config and UI on startup
     private void updateConfigDataItemOnStartup() {
         LBWFUtil.fetchConfigDataMap(googleApiClient,
                 new LBWFUtil.FetchConfigDataMapCallback() {
@@ -57,6 +57,8 @@ public class DataApiHelper implements DataApi.DataListener,
         }
     }
 
+    // potentially updates UI for config
+    // listener gets notified only if there is, in fact, an update
     private void updateUiForConfigDataMap(final DataMap config) {
         boolean uiUpdated = false;
         for (String configKey : config.keySet()) {
@@ -72,6 +74,7 @@ public class DataApiHelper implements DataApi.DataListener,
         }
     }
 
+    // sets new value in config
     public void updateConfigDataItem (final String configCode, final int configValue) {
         DataMap configKeysToOverwrite = new DataMap();
         configKeysToOverwrite.putInt(configCode, configValue);
@@ -81,12 +84,15 @@ public class DataApiHelper implements DataApi.DataListener,
     @Override
     public void onConnected(Bundle bundle) {
         Wearable.DataApi.addListener(googleApiClient, DataApiHelper.this);
+        // after connecting successfully, we want to get current config values and update
+        // UI accordingly
         updateConfigDataItemOnStartup();
     }
 
     @Override
     public void onConnectionSuspended(int i) {}
 
+    // new config data has arrived
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
         try {
@@ -113,6 +119,9 @@ public class DataApiHelper implements DataApi.DataListener,
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {}
 
+    // listener needs to be able to handle a given config key-value pair
+    // (or ignore a given config key-value pair)
+    // it also needs to be notified in case something gets updated
     public interface DataHelperInterface {
         public boolean updateUiForKey (String configKey, int configValue);
         public void onUiUpdated ();

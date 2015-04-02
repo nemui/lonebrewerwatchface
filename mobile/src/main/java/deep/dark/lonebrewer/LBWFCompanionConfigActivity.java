@@ -36,7 +36,7 @@ public class LBWFCompanionConfigActivity extends Activity
     private static final int BARRELS_COLOUR = 0, MAGMA_COLOUR = 1, CROPS_COLOUR = 2;
 
     private String peerId;
-    private Switch timeModeSwitch, weekdaysSwitch, hemisphereSwitch;
+    private Switch timeModeSwitch, dayOfTheWeekSwitch, hemisphereSwitch;
     private CircledImageView barrelsColourView, magmaColourView, cropsColourView;
     private int barrelsColour, magmaColour, cropsColour, whichColour;
     private GoogleApiClient googleApiClient;
@@ -54,8 +54,8 @@ public class LBWFCompanionConfigActivity extends Activity
             }
         });
 
-        weekdaysSwitch = (Switch) findViewById(R.id.weekdaysSwitch);
-        weekdaysSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        dayOfTheWeekSwitch = (Switch) findViewById(R.id.weekdaysSwitch);
+        dayOfTheWeekSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 sendConfigUpdateMessage(LBWFUtil.KEY_DAY_OF_THE_WEEK, isChecked ? 1 : 0);
@@ -200,7 +200,7 @@ public class LBWFCompanionConfigActivity extends Activity
 
     private void setUpUI(DataMap config) {
         timeModeSwitch.setChecked(config.getInt(LBWFUtil.KEY_TIME_MODE) == 1);
-        weekdaysSwitch.setChecked(config.getInt(LBWFUtil.KEY_DAY_OF_THE_WEEK) == 1);
+        dayOfTheWeekSwitch.setChecked(config.getInt(LBWFUtil.KEY_DAY_OF_THE_WEEK) == 1);
         hemisphereSwitch.setChecked(config.getInt(LBWFUtil.KEY_HEMISPHERE) == 0);
         barrelsColour = config.getInt(LBWFUtil.KEY_BARRELS_COLOUR);
         magmaColour = config.getInt(LBWFUtil.KEY_MAGMA_COLOUR);

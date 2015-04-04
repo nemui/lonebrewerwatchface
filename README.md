@@ -9,7 +9,7 @@ Lord Nightmare/IBM 8x8 tileset from Dwarf Fortress tileset repository<br/ >
 http://dwarffortresswiki.org/Tileset_repository<br/ >
 REXPaint<br/ >
 http://rexpaint.blogspot.jp/<br/ >
-Android Wear Color Picker and Android Color Picker<br/ >
+Android Wear Color Picker and Color Picker for Android<br/ >
 https://github.com/BoD/android-wear-color-picker<br/ >
 https://github.com/chiralcode/Android-Color-Picker/<br/ >
 Analogue and Digital Watch Face samples.

@@ -23,6 +23,7 @@ import android.view.WindowInsets;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.TimeZone;
@@ -66,31 +67,43 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
         return new Engine();
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine {
-        static final int MSG_UPDATE_TIME = 0;
+    static class TimeHandler extends Handler {
+        private final WeakReference<Engine> engineReference;
 
-        // handler to update the time once a second in interactive mode
-        final Handler updateTimeHandler = new Handler() {
-            @Override
-            public void handleMessage(Message message) {
-                switch (message.what) {
-                    case MSG_UPDATE_TIME:
-                        invalidate();
-                        if (shouldTimerBeRunning()) {
+        TimeHandler(Engine engine) {
+            engineReference = new WeakReference<>(engine);
+        }
+        @Override
+        public void handleMessage(Message msg)
+        {
+            Engine engine = engineReference.get();
+            if (engine != null) {
+                switch (msg.what) {
+                    case Engine.MSG_UPDATE_TIME:
+                        engine.invalidate();
+                        if (engine.shouldTimerBeRunning()) {
                             long timeMs = System.currentTimeMillis();
                             long delayMs = INTERACTIVE_UPDATE_RATE_MS
                                     - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
-                            updateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
+                            sendEmptyMessageDelayed(Engine.MSG_UPDATE_TIME, delayMs);
                         }
                         break;
                 }
             }
-        };
+        }
+    }
+
+    private class Engine extends CanvasWatchFaceService.Engine {
+        static final int MSG_UPDATE_TIME = 0;
+
+        private final TimeHandler updateTimeHandler = new TimeHandler(this);
 
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 calendar.setTimeZone(TimeZone.getTimeZone(intent.getStringExtra("time-zone")));
+                prevMinutes = -1;
+                invalidate();
             }
         };
 
@@ -319,11 +332,7 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
         }
 
         @Override
-        public void onDraw(Canvas canvas, Rect bounds) {
-            int width = bounds.width();
-            int height = bounds.height();
-
-            // draw the background
+        public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             if (backgroundBitmap == null
                     || backgroundBitmap.getWidth() != width
                     || backgroundBitmap.getHeight() != height) {
@@ -344,7 +353,11 @@ public class LoneBrewerWatchFace extends CanvasWatchFaceService {
                     generateBackground(width, height, dateRow + 2);
                 }
             }
+            super.onSurfaceChanged(holder, format, width, height);
+        }
 
+        @Override
+        public void onDraw(Canvas canvas, Rect bounds) {
             calendar.setTimeInMillis(System.currentTimeMillis());
             minutes = calendar.get(Calendar.MINUTE);
 

@@ -1,4 +1,4 @@
-package deep.dark.lonebrewer;
+package deep.dark.lonebrewercommon;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -16,7 +16,7 @@ public class AsciiObject {
     // for relative positioning
     public int width, height;
 
-    int col, row;
+    public int col, row;
     Rect[] srcRects, dstRects;
 
     public AsciiObject(String ascii, Tileset tileset) {

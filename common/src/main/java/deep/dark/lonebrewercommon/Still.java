@@ -1,4 +1,4 @@
-package deep.dark.lonebrewer;
+package deep.dark.lonebrewercommon;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
